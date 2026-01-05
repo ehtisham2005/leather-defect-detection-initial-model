@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leather QC | AI Inspector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            color: var(--text-sub);
+            font-size: 1.1rem;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 15px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f1f5f9;
+        }
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: #eff6ff;
+            transform: translateY(-2px);
+        }
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .upload-text {
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        /* Results Section */
+        .verdict-banner {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .verdict-reject { background: #fef2f2; color: var(--danger); border: 1px solid #fee2e2; }
+        .verdict-accept { background: #f0fdf4; color: var(--success); border: 1px solid #dcfce7; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+        .card:hover { transform: translateY(-5px); }
+        
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .card-body { padding: 15px; }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .badge-bad { background: #fee2e2; color: var(--danger); }
+        .badge-good { background: #dcfce7; color: var(--success); }
+
+        .defect-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+
+        .confidence-label {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        /* Reset Button */
+        .btn-reset {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 30px;
+            background: var(--text-main);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.2s;
+        }
+        .btn-reset:hover { background: #0f172a; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>👜 Quality Control AI</h1>
+        <div class="subtitle">Automated Leather Defect Detection System</div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label class="upload-area">
+            <span class="upload-icon">📂</span>
+            <span class="upload-text">Drop photos here or click to upload</span>
+            <input type="file" name="files[]" multiple required onchange="this.form.submit()" hidden>
+        </label>
+    </form>
+
+    {% if results %}
+        {% if bag_rejected %}
+            <div class="verdict-banner verdict-reject">
+                ❌ REJECT BAG
+                <div style="font-size: 0.9rem; margin-top: 5px; font-weight: 400; opacity: 0.8;">Defects detected in one or more views</div>
+            </div>
+        {% else %}
+            <div class="verdict-banner verdict-accept">
+                ✅ ACCEPT BAG
+                <div style="font-size: 0.9rem; margin-top: 5px; font-weight: 400; opacity: 0.8;">All views passed quality inspection</div>
+            </div>
+        {% endif %}
+
+        <div class="grid">
+            {% for res in results %}
+            <div class="card">
+                <img src="{{ url_for('static', filename='uploads/' + res.image) }}" alt="bag">
+                <div class="card-body">
+                    {% if res.is_defect %}
+                        <span class="badge badge-bad">Defect</span>
+                    {% else %}
+                        <span class="badge badge-good">Pass</span>
+                    {% endif %}
+                    
+                    <div class="defect-name">{{ res.class }}</div>
+                    
+                    <div class="confidence-label">
+                        <span>Confidence</span>
+                        <span>{{ res.confidence }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" 
+                             style="width: {{ res.confidence }}%; background: {% if res.is_defect %}var(--danger){% else %}var(--success){% endif %};">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <a href="/" class="btn-reset">Inspect Next Bag</a>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

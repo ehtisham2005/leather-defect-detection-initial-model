@@ -1,0 +1,20 @@
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Virtual env
+venv/
+env/
+.venv/
+
+# Secrets
+.env
+
+# Data, uploads, and model weights
+dataset/
+static/uploads/
+leather_defect_model.h5
+
+# IDEs
+.vscode/
+.idea/
