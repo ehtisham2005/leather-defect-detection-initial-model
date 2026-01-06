@@ -1,7 +1,8 @@
 tensorflow
-numpy
+numpy==1.24.4
 matplotlib
 opencv-python
 streamlit
 gradio
 Pillow
+scikit-learn
